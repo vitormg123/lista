@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Allura&display=swap" rel="stylesheet">
+    <title>MercadoVMG</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: orange;
+            border-bottom: 5px solid brown;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        header h1 {
+            font-family: 'Allura', cursive;
+            font-size: 50pt;
+            margin: 0;
+        }
+
+        .search-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        .button {
+            background-color: navy;
+            color: white;
+            border: 1px solid lightblue;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-left: 10px;
+            width: 120px; /* Definindo a largura fixa para todos os botões */
+        }
+
+        .sidebar {
+            position: absolute;
+            left: -50px; /* Inicialmente escondido */
+            top: 100px;
+            background-color: brown;
+            width: 200px;
+            height: calc(100vh - 120px); /* Ajustar altura para não sobresair o cabeçalho */
+            transition: left 0.3s;
+            overflow: hidden;
+            border-radius: 10px; /* Arredondar os cantos */
+        }
+
+        .toggle-button {
+            background-color: brown;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px; /* Arredondar os cantos do botão de toggle */
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column; /* Organizar botões verticalmente */
+            padding: 10px; /* Espaçamento interno */
+        }
+
+        .menu-item {
+            background-color: orange;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin: 5px 0;
+            border-radius: 10px; /* Arredondar os cantos dos botões do menu */
+        }
+
+        .products-container, .cart-container {
+            margin-left: 220px;
+            padding: 20px;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between; /* Espaço entre a imagem e os itens à direita */
+            align-items: center; /* Alinhar itens ao centro verticalmente */
+            background-color: white;
+            border: 1px solid transparent;
+            padding: 10px;
+            margin: 10px 0;
+            transition: border 0.3s;
+            border-radius: 10px; /* Arredondar os cantos */
+        }
+
+        .product-item:hover {
+            border: 1px solid black;
+        }
+
+        .product-image {
+            width: 100px; /* Definindo o tamanho das imagens */
+            height: 100px; /* Definindo a altura das imagens */
+            margin-right: 10px; /* Espaçamento entre imagem e texto */
+        }
+
+        .product-details {
+            flex-grow: 1; /* Faz a seção de detalhes ocupar o espaço restante */
+            display: flex;
+            flex-direction: column; /* Colocar o texto e preço em coluna */
+            justify-content: center; /* Centralizar verticalmente */
+        }
+
+        .add-to-cart, .remove-item {
+            background-color: navy;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            width: 120px; /* Definindo a largura fixa para os botões de adicionar/remover */
+        }
+
+        .cart-container {
+            padding: 20px;
+        }
+
+        .finalize-button {
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .form-container {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            z-index: 10;
+            border-radius: 10px; /* Arredondar os cantos */
+        }
+
+        .submit-button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>MercadoVMG</h1>
+        <div class="search-container">
+            <input type="text" placeholder="Pesquisar produto">
+            <button class="button search-button">Pesquisar</button>
+            <button class="button cart-button">Carrinho</button>
+            <button class="button register-button" onclick="showForm()">Cadastrar Produto</button>
+        </div>
+    </header>
+
+    <div class="sidebar">
+        <button class="toggle-button" onclick="toggleSidebar()">></button>
+        <div class="menu">
+            <button class="menu-item" onclick="showProducts('carnes')">Carnes</button>
+            <button class="menu-item" onclick="showProducts('padaria')">Padaria</button>
+            <button class="menu-item" onclick="showProducts('temperos')">Temperos</button>
+            <button class="menu-item" onclick="showProducts('bebidas')">Bebidas</button>
+            <button class="menu-item" onclick="showProducts('freezers')">Freezers</button>
+        </div>
+    </div>
+
+    <main>
+        <div class="products-container" id="products"></div>
+        <div class="cart-container" id="cart" style="display: none;"></div>
+    </main>
+
+    <div class="overlay" id="overlay" onclick="hideForm()"></div>
+    <div class="form-container" id="form-container">
+        <h3>Cadastrar Produto</h3>
+        <input type="text" id="productName" placeholder="Nome do Produto">
+        <input type="text" id="productSector" placeholder="Setor do Produto">
+        <input type="text" id="productPrice" placeholder="Preço do Produto">
+        <button class="submit-button" id="submit-button" onclick="addProduct()">Cadastrar Produto</button>
+    </div>
+
+    <script>
+        let sidebarVisible = false;
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.style.left = sidebarVisible ? '-50px' : '0';
+            sidebarVisible = !sidebarVisible;
+        }
+
+        const cartItems = [];
+        const products = {
+            carnes: [
+                { name: 'Frango Assado', price: 'R$ 10,00', image: 'imagens/frango-assado.png' },
+                { name: 'Carne Assada', price: 'R$ 25,00', image: 'imagens/carne-assada.png' }
+            ],
+            padaria: [
+                { name: 'Pão d\'Água', price: 'R$ 1,00', image: 'imagens/pao-dagua.png' },
+                { name: 'Croissant', price: 'R$ 3,50', image: 'imagens/croissant.png' }
+            ],
+            temperos: [
+                { name: 'Sal', price: 'R$ 2,00', image: 'imagens/sal.png' },
+                { name: 'Pimenta', price: 'R$ 2,50', image: 'imagens/pimenta.png' }
+            ],
+            bebidas: [
+                { name: 'Refrigerante', price: 'R$ 5,00', image: 'imagens/refrigerantes.png' },
+                { name: 'Cerveja', price: 'R$ 8,00', image: 'imagens/cerveja.png' }
+            ],
+            freezers: [
+                { name: 'Sorvete', price: 'R$ 15,00', image: 'imagens/sorvete.png' },
+                { name: 'Pizza Catupiry', price: 'R$ 20,00', image: 'imagens/pizza-catupiry.png' }
+            ]
+        };
+
+        function showProducts(sector) {
+            const productsContainer = document.getElementById('products');
+            productsContainer.innerHTML = '';
+
+            products[sector].forEach(product => {
+                const productDiv = document.createElement('div');
+                productDiv.className = 'product-item';
+                productDiv.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-details">
+                        <span>${product.name}</span>
+                        <span>${product.price}</span>
+                    </div>
+                    <div>
+                        <button class="add-to-cart button" onclick="addToCart('${product.name}', '${product.price}')">Adicionar ao Carrinho</button>
+                        <button class="remove-item button" style="background-color: red;" oncontextmenu="removeProduct(event, '${product.name}')">Remover</button>
+                    </div>
+                `;
+                productsContainer.appendChild(productDiv);
+            });
+        }
+
+        function addToCart(name, price) {
+            cartItems.push({ name, price });
+            alert(`${name} foi adicionado ao carrinho!`);
+        }
+
+        document.querySelector('.cart-button').addEventListener('click', () => {
+            const cart = document.getElementById('cart');
+            cart.style.display = cart.style.display === 'none' ? 'block' : 'none';
+            showCart();
+        });
+
+        function showCart() {
+            const cart = document.getElementById('cart');
+            cart.innerHTML = '';
+            if (cartItems.length === 0) {
+                cart.innerHTML = '<p>Carrinho vazio.</p>';
+                return;
+            }
+
+            cartItems.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.innerHTML = `${item.name} - ${item.price} 
+                <button class="remove-item button" style="background-color: red;" onclick="removeFromCart(${index})">Remover</button>`;
+                cart.appendChild(itemDiv);
+            });
+
+            const finalizeButton = document.createElement('button');
+            finalizeButton.className = 'finalize-button';
+            finalizeButton.innerText = 'Finalizar Compra';
+            cart.appendChild(finalizeButton);
+        }
+
+        function removeFromCart(index) {
+            cartItems.splice(index, 1);
+            showCart();
+        }
+
+        function showForm() {
+            document.getElementById('form-container').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function hideForm() {
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function addProduct() {
+            const name = document.getElementById('productName').value;
+            const sector = document.getElementById('productSector').value;
+            const price = document.getElementById('productPrice').value;
+
+            if (name && sector && price) {
+                products[sector] = products[sector] || [];
+                products[sector].push({ name, price, image: '' }); // Imagem não é necessária no cadastro
+                hideForm();
+                alert(`Produto ${name} cadastrado com sucesso!`);
+                showProducts(sector);
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        }
+
+        function removeProduct(event, name) {
+            event.preventDefault();
+            for (const sector in products) {
+                products[sector] = products[sector].filter(product => product.name !== name);
+            }
+            showProducts(sector);
+        }
+    </script>
+
+</body>
+</html>
